@@ -59,10 +59,12 @@ const pickQuestions = () => {
 };
 const getMultiplier = (s) => s >= 5 ? 3 : s >= 3 ? 2 : s >= 2 ? 1.5 : 1;
 const getResultMsg = (n) => {
-  if (n === 10) return { title:"Você é um Expert Syngenta!", sub:"Pontuação perfeita! Incrível conhecimento.", emoji:"🌟", color:"#FFD700" };
-  if (n >= 7)  return { title:"Impressionante!", sub:"Você conhece muito bem a Syngenta!", emoji:"🏆", color:"#00A651" };
-  if (n >= 4)  return { title:"Bom começo!", sub:"Continue aprendendo sobre nossos produtos.", emoji:"🌱", color:"#60A5FA" };
-  return { title:"Continue explorando!", sub:"Temos muito a mostrar sobre a Syngenta!", emoji:"📚", color:"#A78BFA" };
+  if (n === 10) return { title:"Você sabe mais que o próprio CEO!", sub:"Perfeito absoluto. Honestamente, o que você está fazendo aqui? Vai lá dirigir a empresa.", emoji:"🌟", color:"#FFD700" };
+  if (n >= 8)  return { title:"O RH quer te contratar agora!", sub:"Conhecimento de dar inveja em gerente sênior. Impressionante de verdade.", emoji:"🏆", color:"#00A651" };
+  if (n >= 6)  return { title:"Não é ruim… mas dá pra melhorar.", sub:"Você claramente leu pelo menos a primeira página do catálogo. Continue assim.", emoji:"😎", color:"#60A5FA" };
+  if (n >= 4)  return { title:"Você passou… por pouco.", sub:"Deu pra sentir que você chutou algumas. A soja te viu e ficou preocupada.", emoji:"🌱", color:"#FFA500" };
+  if (n >= 1)  return { title:"Nem o estagiário errou tanto!", sub:"Com 1 semana de empresa o estagiário já sabe mais. Mas tudo bem, a jornada começa agora!", emoji:"😅", color:"#E53E3E" };
+  return { title:"Você zerou… do lado errado.", sub:"Zero acertos. ZERO. Nem o nome da empresa você sabia? Vamos começar do básico.", emoji:"🥴", color:"#A78BFA" };
 };
 const MOTIV = ["Excelente!","Mandou bem!","Perfeito!","Arrasou!","Show!","Incrível!","Isso aí!"];
 
@@ -208,31 +210,6 @@ const Confetti = () => {
   );
 };
 
-// ─── Floating Particles (background) ─────────────────────────────────────────
-const FloatingParticles = () => {
-  const particles = Array.from({ length: 18 }, (_, i) => ({
-    id: i,
-    left: `${5 + (i * 5.5) % 90}%`,
-    size: `${12 + Math.random() * 16}px`,
-    delay: `${(i * 1.1) % 6}s`,
-    duration: `${6 + (i % 4)}s`,
-    emoji: ["🌿","🍃","🌾","🌱","✦","🍀"][i % 6],
-    opacity: 0.12 + Math.random() * 0.15,
-  }));
-  return (
-    <div style={{ position:"fixed", inset:0, pointerEvents:"none", overflow:"hidden", zIndex:0 }}>
-      {particles.map(p => (
-        <div key={p.id} style={{
-          position:"absolute", left:p.left, bottom:"-30px",
-          fontSize:p.size, opacity:p.opacity,
-          animation:`floatUp ${p.duration} ${p.delay} ease-in-out infinite`,
-        }}>
-          {p.emoji}
-        </div>
-      ))}
-    </div>
-  );
-};
 
 // ─── Score Pop ────────────────────────────────────────────────────────────────
 const ScorePop = ({ value, x, y }) => (
@@ -514,7 +491,6 @@ export default function SyngentaTriviaGame() {
         @keyframes timerPulse{0%,100%{opacity:1}50%{opacity:0.5}}
       `}</style>
 
-      <FloatingParticles />
       {showConfetti && <Confetti />}
       {scorePops.map(s => <ScorePop key={s.id} value={s.value} x={s.x} y={s.y} />)}
 
@@ -522,15 +498,16 @@ export default function SyngentaTriviaGame() {
 
         {/* Mute */}
         {gameState !== "start" && (
-          <button onClick={() => setMuted(m => !m)} style={{
-            position:"absolute", top:0, right:0, zIndex:10,
-            background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.2)",
-            borderRadius:"50%", width:"38px", height:"38px",
-            cursor:"pointer", color:"#fff", fontSize:"17px",
-            display:"flex", alignItems:"center", justifyContent:"center",
-          }}>
-            {muted ? "🔇" : "🔊"}
-          </button>
+          <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:"10px" }}>
+            <button onClick={() => setMuted(m => !m)} style={{
+              background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.2)",
+              borderRadius:"50%", width:"38px", height:"38px",
+              cursor:"pointer", color:"#fff", fontSize:"17px",
+              display:"flex", alignItems:"center", justifyContent:"center",
+            }}>
+              {muted ? "🔇" : "🔊"}
+            </button>
+          </div>
         )}
 
         {/* ══ START ══ */}
