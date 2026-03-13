@@ -71,115 +71,122 @@ const MOTIV = ["Excelente!","Mandou bem!","Perfeito!","Arrasou!","Show!","Incrí
 // ─── Mascot SVG ───────────────────────────────────────────────────────────────
 // mood: idle | happy | wrong | thinking | celebrate
 const Mascot = ({ mood = "idle", size = 120 }) => {
-  const eyeY = mood === "wrong" ? 68 : 65;
-  const mouthPath = mood === "happy" || mood === "celebrate"
-    ? "M 38 85 Q 50 98 62 85"
-    : mood === "wrong"
-    ? "M 38 92 Q 50 83 62 92"
-    : "M 40 87 Q 50 91 60 87";
+  // All coordinates are fixed; bodyBounce applied via a single <g> transform
+  const bounce = (mood === "celebrate" || mood === "happy") ? -4 : 0;
+  const armL   = mood === "celebrate" ? -45 : mood === "happy" ? -25 : 8;
+  const armR   = mood === "celebrate" ?  45 : mood === "happy" ?  25 : -8;
 
-  const leftPupilX = mood === "thinking" ? 43 : 44;
-  const rightPupilX = mood === "thinking" ? 59 : 58;
+  // Face expressions — all relative to head center (50, 50)
+  // Eyes sit at y=50, ±10 from center x
+  const eyeLX = 40, eyeRX = 60, eyeY = 50;
+  // Pupils shift slightly per mood
+  const pupilDX = mood === "thinking" ? 2 : 0;
 
-  const armLAngle = mood === "celebrate" ? -40 : mood === "happy" ? -20 : 10;
-  const armRAngle = mood === "celebrate" ? 40 : mood === "happy" ? 20 : -10;
-  const bodyBounce = mood === "celebrate" || mood === "happy" ? -4 : 0;
-  const eyebrowMood = mood === "wrong" ? 1 : mood === "thinking" ? -3 : 0;
+  // Eyebrow offset (positive = furrowed/lower)
+  const browY = mood === "wrong" ? 38 : mood === "thinking" ? 36 : 39;
+
+  // Mouth paths — all centered at x=50, below eyes
+  const mouth =
+    mood === "happy" || mood === "celebrate"
+      ? "M 41 62 Q 50 70 59 62"   // big smile
+      : mood === "wrong"
+      ? "M 41 67 Q 50 61 59 67"   // frown
+      : "M 42 64 Q 50 68 58 64";  // neutral/small smile
 
   return (
     <svg
       width={size}
-      height={size}
-      viewBox="0 0 100 130"
-      style={{
-        filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.4))",
-        overflow: "visible",
-      }}
+      height={size * 1.2}
+      viewBox="0 0 100 120"
+      style={{ filter:"drop-shadow(0 8px 16px rgba(0,0,0,0.4))", overflow:"visible" }}
     >
-      {/* Shadow */}
-      <ellipse cx="50" cy="128" rx="22" ry="5" fill="rgba(0,0,0,0.25)" />
+      {/* Ground shadow — stays fixed */}
+      <ellipse cx="50" cy="118" rx="22" ry="4" fill="rgba(0,0,0,0.22)" />
 
-      {/* Legs */}
-      <rect x="37" y={106 + bodyBounce} width="10" height="18" rx="5" fill="#006838" />
-      <rect x="53" y={106 + bodyBounce} width="10" height="18" rx="5" fill="#006838" />
-      {/* Feet */}
-      <ellipse cx="42" cy={124 + bodyBounce} rx="7" ry="4" fill="#004d28" />
-      <ellipse cx="58" cy={124 + bodyBounce} rx="7" ry="4" fill="#004d28" />
+      {/* Everything that bounces wraps here */}
+      <g transform={`translate(0, ${bounce})`}>
 
-      {/* Body */}
-      <rect x="28" y={72 + bodyBounce} width="44" height="38" rx="14" fill="#00A651" />
+        {/* ── Legs ── */}
+        <rect x="37" y="96" width="10" height="16" rx="5" fill="#006838" />
+        <rect x="53" y="96" width="10" height="16" rx="5" fill="#006838" />
+        <ellipse cx="42" cy="113" rx="7" ry="4" fill="#004d28" />
+        <ellipse cx="58" cy="113" rx="7" ry="4" fill="#004d28" />
 
-      {/* Belt */}
-      <rect x="28" y={95 + bodyBounce} width="44" height="6" rx="3" fill="#006838" />
-      <rect x="46" y={93 + bodyBounce} width="8" height="10" rx="3" fill="#FFD700" />
+        {/* ── Body ── */}
+        <rect x="27" y="66" width="46" height="34" rx="14" fill="#00A651" />
 
-      {/* Left Arm */}
-      <g transform={`rotate(${armLAngle}, 28, ${82 + bodyBounce})`}>
-        <rect x="14" y={78 + bodyBounce} width="16" height="9" rx="4.5" fill="#00A651" />
-        <circle cx="14" cy={82 + bodyBounce} r="6" fill="#a8d5a2" />
+        {/* Belt */}
+        <rect x="27" y="87" width="46" height="6"  rx="3" fill="#006838" />
+        <rect x="45" y="85" width="10" height="10" rx="3" fill="#FFD700" />
+
+        {/* ── Left Arm ── */}
+        <g transform={`rotate(${armL}, 27, 78)`}>
+          <rect x="9"  y="74" width="20" height="9" rx="4.5" fill="#00A651" />
+          <circle cx="9" cy="78" r="6" fill="#a8d5a2" />
+        </g>
+
+        {/* ── Right Arm ── */}
+        <g transform={`rotate(${armR}, 73, 78)`}>
+          <rect x="71" y="74" width="20" height="9" rx="4.5" fill="#00A651" />
+          <circle cx="91" cy="78" r="6" fill="#a8d5a2" />
+        </g>
+
+        {/* ── Neck ── */}
+        <rect x="43" y="57" width="14" height="12" rx="6" fill="#b5d9af" />
+
+        {/* ── Head ── */}
+        <circle cx="50" cy="50" r="27" fill="#c8e6c0" />
+
+        {/* ── Hat brim ── */}
+        <ellipse cx="50" cy="24" rx="23" ry="6"  fill="#005c2e" />
+        {/* Hat top */}
+        <rect   x="33"  y="10" width="34" height="16" rx="8" fill="#007a3d" />
+        {/* Leaf on hat */}
+        <path d="M50,8 C43,0 57,0 50,8" fill="#00C86A" />
+        <line x1="50" y1="8" x2="50" y2="3" stroke="#006838" strokeWidth="0.8" />
+
+        {/* ── Cheeks ── */}
+        <ellipse cx="31" cy="55" rx="5" ry="3.5" fill="rgba(255,140,140,0.45)" />
+        <ellipse cx="69" cy="55" rx="5" ry="3.5" fill="rgba(255,140,140,0.45)" />
+
+        {/* ── Eyebrows ── */}
+        <path d={`M ${eyeLX-5} ${browY} Q ${eyeLX} ${browY-4} ${eyeLX+5} ${browY}`}
+          stroke="#3a6632" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+        <path d={`M ${eyeRX-5} ${browY} Q ${eyeRX} ${browY-4} ${eyeRX+5} ${browY}`}
+          stroke="#3a6632" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+
+        {/* ── Eyes (white) ── */}
+        <circle cx={eyeLX} cy={eyeY} r="6.5" fill="white" />
+        <circle cx={eyeRX} cy={eyeY} r="6.5" fill="white" />
+        {/* Pupils */}
+        <circle cx={eyeLX + pupilDX} cy={eyeY + 1} r="3.8" fill="#1e3a1a" />
+        <circle cx={eyeRX + pupilDX} cy={eyeY + 1} r="3.8" fill="#1e3a1a" />
+        {/* Shine */}
+        <circle cx={eyeLX + pupilDX + 1.5} cy={eyeY - 1.5} r="1.4" fill="white" />
+        <circle cx={eyeRX + pupilDX + 1.5} cy={eyeY - 1.5} r="1.4" fill="white" />
+
+        {/* ── Mouth ── */}
+        <path d={mouth} stroke="#3a6632" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+
+        {/* ── Thinking bubble ── */}
+        {mood === "thinking" && (
+          <>
+            <circle cx="72" cy="38" r="3"   fill="rgba(255,255,255,0.75)" />
+            <circle cx="80" cy="29" r="5"   fill="rgba(255,255,255,0.75)" />
+            <circle cx="89" cy="19" r="8"   fill="rgba(255,255,255,0.88)" />
+            <text x="89" y="23" textAnchor="middle" fontSize="9" fill="#333" fontWeight="bold">?</text>
+          </>
+        )}
+
+        {/* ── Celebrate stars ── */}
+        {(mood === "celebrate" || mood === "happy") && (
+          <>
+            <text x="6"  y="35" fontSize="14">⭐</text>
+            <text x="78" y="28" fontSize="12">✨</text>
+          </>
+        )}
+
       </g>
-
-      {/* Right Arm */}
-      <g transform={`rotate(${armRAngle}, 72, ${82 + bodyBounce})`}>
-        <rect x="70" y={78 + bodyBounce} width="16" height="9" rx="4.5" fill="#00A651" />
-        <circle cx="86" cy={82 + bodyBounce} r="6" fill="#a8d5a2" />
-      </g>
-
-      {/* Neck */}
-      <rect x="42" y={62 + bodyBounce} width="16" height="12" rx="6" fill="#a8d5a2" />
-
-      {/* Head */}
-      <circle cx="50" cy={50 + bodyBounce} r="28" fill="#c8e6c0" />
-
-      {/* Hat / leaf crown */}
-      <ellipse cx="50" cy={23 + bodyBounce} rx="24" ry="6" fill="#006838" />
-      <ellipse cx="50" cy={22 + bodyBounce} rx="18" ry="5" fill="#00A651" />
-      {/* Leaf on hat */}
-      <path d={`M50,${14 + bodyBounce} C44,${6 + bodyBounce} 56,${4 + bodyBounce} 50,${14 + bodyBounce}`} fill="#00C86A" />
-      <path d={`M50,${14 + bodyBounce} C44,${6 + bodyBounce} 56,${4 + bodyBounce} 50,${14 + bodyBounce}`} fill="none" stroke="#006838" strokeWidth="0.5" />
-
-      {/* Cheeks */}
-      <ellipse cx="32" cy={57 + bodyBounce} rx="5" ry="3.5" fill="rgba(255,150,150,0.4)" />
-      <ellipse cx="68" cy={57 + bodyBounce} rx="5" ry="3.5" fill="rgba(255,150,150,0.4)" />
-
-      {/* Eyebrows */}
-      <path d={`M38,${53 + bodyBounce + eyebrowMood} Q44,${50 + bodyBounce + eyebrowMood} 48,${53 + bodyBounce + eyebrowMood}`} stroke="#4a7c3f" strokeWidth="2" fill="none" strokeLinecap="round" />
-      <path d={`M52,${53 + bodyBounce + eyebrowMood} Q56,${50 + bodyBounce + eyebrowMood} 62,${53 + bodyBounce + eyebrowMood}`} stroke="#4a7c3f" strokeWidth="2" fill="none" strokeLinecap="round" />
-
-      {/* Eyes */}
-      <circle cx="44" cy={eyeY + bodyBounce} r="6" fill="white" />
-      <circle cx="56" cy={eyeY + bodyBounce} r="6" fill="white" />
-      <circle cx={leftPupilX} cy={eyeY + 1 + bodyBounce} r="3.5" fill="#2d4a26" />
-      <circle cx={rightPupilX} cy={eyeY + 1 + bodyBounce} r="3.5" fill="#2d4a26" />
-      {/* Pupils shine */}
-      <circle cx={leftPupilX + 1} cy={eyeY - 1 + bodyBounce} r="1.2" fill="white" />
-      <circle cx={rightPupilX + 1} cy={eyeY - 1 + bodyBounce} r="1.2" fill="white" />
-
-      {/* Mouth */}
-      <path d={mouthPath.replace(/(\d+)/g, (m, n, o) => {
-        // offset y values by bodyBounce
-        if (o > 0 && mouthPath[o-1] === ' ') return String(parseInt(n) + bodyBounce);
-        return n;
-      })} stroke="#4a7c3f" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-
-      {/* Thinking bubble */}
-      {mood === "thinking" && (
-        <>
-          <circle cx="72" cy={44 + bodyBounce} r="3" fill="rgba(255,255,255,0.7)" />
-          <circle cx="79" cy={36 + bodyBounce} r="5" fill="rgba(255,255,255,0.7)" />
-          <circle cx="88" cy={26 + bodyBounce} r="8" fill="rgba(255,255,255,0.85)" />
-          <text x="88" y={30 + bodyBounce} textAnchor="middle" fontSize="9" fill="#333">?</text>
-        </>
-      )}
-
-      {/* Stars for celebrate */}
-      {(mood === "celebrate" || mood === "happy") && (
-        <>
-          <text x="10" y={38 + bodyBounce} fontSize="14" style={{ animation: "starFloat 0.6s ease infinite alternate" }}>⭐</text>
-          <text x="78" y={32 + bodyBounce} fontSize="12" style={{ animation: "starFloat 0.6s ease 0.2s infinite alternate" }}>✨</text>
-          <text x="5"  y={60 + bodyBounce} fontSize="10">🌟</text>
-        </>
-      )}
     </svg>
   );
 };
